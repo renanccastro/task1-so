@@ -7,6 +7,9 @@
 
 // T
 #define K 10
+typedef enum direction { 
+	NORTH, EAST, SOUTH, WEST
+ } direction;
 
 using namespace std;
 
@@ -21,25 +24,19 @@ int num_bats;
 
 // Batman
 void *batman(void *arg){
-	while(){
-		
-	}
+	int num_bats_local;
+	do{
+		pthread_mutex_lock(&num_bats_mutex);
+		num_bats_local = num_bats;
+		pthread_mutex_unlock(&num_bats_mutex);
+
+	}while(num_bats_local);
 }
 
 // Trem vindo do norte
 void *north_bat(void *arg) {
 	char * inputString = (char*)arg;
 	int queue_size;
-	for (int i = 0; i < strlen(inputString); i++)
-	{
-		if (inputString[i] == 'n')
-		{
-			//adiciona na queue
-			north_queue.push(i+1);
-			printf("Adicionou BAT %d na fila\n", i+1);
-
-		}
-	}
 	queue_size = north_queue.size();
 	for (int i = 0; i < queue_size(); i++)
 	{
@@ -63,11 +60,30 @@ int main(int argc, char *argv[]) {
 	// Numero de BATs é o tamanho da string de entrada
 	numBat = strlen(argv[1]);
 
+	for (int i = 0; i < numBat; i++)
+	{
+		if (argv[1][i] == 'n')
+		{
+			//adiciona na queue
+			north_queue.push(i+1);
+			printf("Adicionou BAT %d na fila\n", i+1);
+		}else if(argv[1][i] == 's'){
+
+		}else if(argv[1][i] == 'w'){
+
+		}else if(argv[1][i] == 'e'){
+
+		}
+	}
+
+
 	// Threads para cada direcao
-	pthread_t batid[4];
+	pthread_t direction_thred[4];
+	pthread_t batman;
 
 	// Inicia o mutex para acesso ao numero total de bats
 	pthread_mutex_init(&num_bats_mutex, NULL);
+
 
 
 	// Inicia o semaforo de cada direção
@@ -75,6 +91,8 @@ int main(int argc, char *argv[]) {
 
 	//inicializa as threads por queue/direcao
 	pthread_create(&batid[0], NULL, north_bat, argv[1]);
+	pthread_create(&batman, NULL, batman, argv[1]);
+
 	pthread_join(batid[0], NULL);
 	// pthread_create(&batid[1], NULL, south_bat, &argv[1]);
 	// pthread_create(&batid[2], NULL, east_bat, &argv[1]);
